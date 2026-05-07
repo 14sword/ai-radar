@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#050508">
+    <title>AI 热搜雷达</title>
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+SC:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="scanlines"></div>
+    <div class="noise"></div>
+    <div class="toast" id="toast"><span class="toast-dot"></span><span id="toastMsg"></span></div>
+
+    <!-- Mobile overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <div class="app">
+        <aside class="sidebar" id="sidebar">
+            <div class="logo">
+                <div class="logo-icon">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z"/>
+                        <path d="M2 17L12 22L22 17"/>
+                        <path d="M2 12L12 17L22 12"/>
+                    </svg>
+                </div>
+                <div class="logo-text">
+                    <span class="logo-title">RADAR</span>
+                    <span class="logo-sub">AI TREND MONITOR</span>
+                </div>
+            </div>
+
+            <nav class="nav">
+                <button class="nav-item active" data-source="all">
+                    <span class="nav-icon">◈</span>
+                    <span>全部监控</span>
+                </button>
+                <button class="nav-item ai-tab" data-source="ai">
+                    <span class="nav-icon ai-glow">⚡</span>
+                    <span>AI 专题</span>
+                </button>
+                <div class="nav-divider"></div>
+                <div class="nav-section">热榜聚合</div>
+                <button class="nav-item" data-source="weibo">
+                    <span class="nav-dot weibo"></span>
+                    <span>微博热搜</span>
+                </button>
+                <button class="nav-item" data-source="bilibili">
+                    <span class="nav-dot bilibili"></span>
+                    <span>B站热搜</span>
+                </button>
+                <button class="nav-item" data-source="douyin">
+                    <span class="nav-dot douyin"></span>
+                    <span>抖音热搜</span>
+                </button>
+                <button class="nav-item" data-source="tiktok">
+                    <span class="nav-dot tiktok"></span>
+                    <span>TikTok</span>
+                </button>
+                <div class="nav-divider"></div>
+                <div class="nav-section">AI 专源</div>
+                <button class="nav-item" data-source="github">
+                    <span class="nav-dot github"></span>
+                    <span>GitHub AI</span>
+                </button>
+                <button class="nav-item" data-source="hackernews">
+                    <span class="nav-dot hackernews"></span>
+                    <span>HackerNews</span>
+                </button>
+                <button class="nav-item" data-source="qbitai">
+                    <span class="nav-dot qbitai"></span>
+                    <span>量子位</span>
+                </button>
+                <button class="nav-item" data-source="arxiv">
+                    <span class="nav-dot arxiv"></span>
+                    <span>ArXiv</span>
+                </button>
+                <button class="nav-item" data-source="36kr">
+                    <span class="nav-dot kr36"></span>
+                    <span>36Kr</span>
+                </button>
+                <div class="nav-divider"></div>
+                <button class="nav-item" data-source="history">
+                    <span class="nav-icon">⏱</span>
+                    <span>24H历史</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="toggle-group">
+                    <label class="toggle-item">
+                        <input type="checkbox" id="autoRefresh" checked>
+                        <span class="toggle-switch"></span>
+                        <span class="toggle-text">自动刷新</span>
+                    </label>
+                </div>
+                <div class="status-bar">
+                    <span class="status-dot"></span>
+                    <span class="status-text" id="statusText">SYSTEM ONLINE</span>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main">
+            <header class="header">
+                <button class="hamburger" id="hamburger">
+                    <span></span><span></span><span></span>
+                </button>
+                <div class="header-left">
+                    <h1 id="pageTitle">全部监控</h1>
+                    <span class="subtitle">AI TREND TRACKING</span>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <input type="text" id="searchInput" placeholder="搜索..." autocomplete="off">
+                        <span class="search-icon">⌕</span>
+                    </div>
+                    <div class="time-filter" id="timeFilter" style="display: none;">
+                        <button class="time-btn active" data-period="all">ALL</button>
+                        <button class="time-btn" data-period="day">24H</button>
+                        <button class="time-btn" data-period="week">7D</button>
+                        <button class="time-btn" data-period="month">30D</button>
+                    </div>
+                    <div class="stats" id="statsBar">
+                        <div class="stat-item">
+                            <span class="stat-value" id="totalCount">0</span>
+                            <span class="stat-label">TOTAL</span>
+                        </div>
+                        <div class="stat-divider"></div>
+                        <div class="stat-item">
+                            <span class="stat-value ai" id="aiCount">0</span>
+                            <span class="stat-label">AI</span>
+                        </div>
+                    </div>
+                    <button class="refresh-btn" id="refreshBtn" title="手动刷新">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 4v6h-6"/>
+                            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+                        </svg>
+                    </button>
+                    <button class="refresh-btn" id="exportBtn" title="导出数据">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                            <polyline points="7 10 12 15 17 10"/>
+                            <line x1="12" y1="15" x2="12" y2="3"/>
+                        </svg>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Mobile quick nav -->
+            <div class="mobile-nav" id="mobileNav">
+                <button class="mobile-nav-item active" data-source="all">全部</button>
+                <button class="mobile-nav-item" data-source="ai">AI</button>
+                <button class="mobile-nav-item" data-source="weibo">微博</button>
+                <button class="mobile-nav-item" data-source="bilibili">B站</button>
+                <button class="mobile-nav-item" data-source="douyin">抖音</button>
+                <button class="mobile-nav-item" data-source="github">GitHub</button>
+                <button class="mobile-nav-item" data-source="arxiv">ArXiv</button>
+            </div>
+
+            <div class="content" id="content">
+                <div class="loading-state">
+                    <div class="terminal-loader">
+                        <span class="terminal-cursor"></span>
+                        <span class="terminal-text">INITIALIZING...</span>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="/static/app.js"></script>
+</body>
+</html>
