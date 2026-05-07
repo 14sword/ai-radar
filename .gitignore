@@ -17,6 +17,10 @@ env/
 .DS_Store
 Thumbs.db
 
+# Security
+certs/
+*.pem
+
 # Logs
 *.log
 
