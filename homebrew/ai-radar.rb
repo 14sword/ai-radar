@@ -1,7 +1,7 @@
 class AiRadar < Formula
   desc "FastAPI Web Dashboard for AI Social Trends Radar"
   homepage "https://github.com/14sword/ai-radar"
-  url "https://github.com/14sword/ai-radar/archive/refs/heads/main.tar.gz"
+  url "https://github.com/14sword/ai-radar.git", branch: "main"
   version "1.0.0"
 
   depends_on "python"

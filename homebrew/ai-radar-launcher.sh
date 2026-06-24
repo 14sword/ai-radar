@@ -7,6 +7,17 @@ cd "$PROJECT_ROOT" || exit 1
 echo "====== AI 热搜雷达 // AI Radar ======"
 
 PORT=8080
+BACKEND_PID=""
+
+# 自动退出清理后台服务进程
+cleanup() {
+    if [ ! -z "$BACKEND_PID" ]; then
+        echo -e "\n[...] 正在关闭本地后台启动的 AI 雷达服务进程 (PID: $BACKEND_PID)..."
+        kill $BACKEND_PID 2>/dev/null
+        echo "[✓] 服务已安全关闭。"
+    fi
+}
+trap cleanup EXIT INT TERM
 
 # 1. 检查服务是否已在运行
 nc -z localhost $PORT >/dev/null 2>&1
@@ -57,8 +68,8 @@ fi
 if [ ! -z "$BACKEND_PID" ]; then
     echo ""
     read -p "是否终止本地后台启动的服务进程？(Y/n): " stop_backend
-    if [[ "$stop_backend" =~ ^[Yy]*$ ]] || [ -z "$stop_backend" ]; then
-        kill $BACKEND_PID
-        echo "[✓] 服务已安全关闭。"
+    if [[ "$stop_backend" =~ ^[Nn]*$ ]] && [ ! -z "$stop_backend" ]; then
+        echo "[!] 服务进程将继续在后台运行 (PID: $BACKEND_PID)。"
+        BACKEND_PID=""
     fi
 fi
