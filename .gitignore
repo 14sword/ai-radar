@@ -5,11 +5,13 @@ __pycache__/
 *.pyd
 .Python
 venv/
+.venv/
 env/
 
 # IDE
 .vscode/
 .idea/
+.claude/
 *.swp
 *.swo
 

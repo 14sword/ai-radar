@@ -81,19 +81,34 @@ git clone https://github.com/14sword/ai-radar.git
 cd ai-radar
 ```
 
-### 2. 安装依赖
+### 2. 启动服务
 
+#### 方法一：使用 Homebrew 快捷启动（推荐 💡）
+如果您是 macOS 用户，可以直接通过项目内置的 Homebrew 脚本一键启动：
 ```bash
-pip install -r requirements.txt
+# 赋予启动脚本执行权限并启动
+chmod +x ./homebrew/ai-radar-launcher.sh
+./homebrew/ai-radar-launcher.sh
+```
+或者，您也可以直接通过 Homebrew 安装为系统全局命令并启动守护服务：
+```bash
+# 安装远程 Formula
+brew install https://raw.githubusercontent.com/14sword/ai-radar/main/homebrew/ai-radar.rb
+
+# 启动常驻后台服务
+brew services start ai-radar
 ```
 
-### 3. 启动服务
-
+#### 方法二：本地手动启动
 ```bash
+# 安装依赖
+pip install -r requirements.txt
+
+# 启动服务
 python run.py
 ```
 
-### 4. 访问
+### 3. 访问
 
 打开浏览器访问 http://127.0.0.1:8080
 
